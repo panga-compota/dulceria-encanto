@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     vueDevTools(),
   ],
-  base:'/',
+  base:'dulceria-encanto',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

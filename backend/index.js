@@ -81,21 +81,26 @@ app.post('/api/payment/qvapay/create-invoice', async (req, res) => {
     
     console.log('📤 Enviando a QvaPay:', JSON.stringify(payload, null, 2))
     
-    const response = await axios.post('https://api.qvapay.com/v2/invoice', payload, { headers })
-    
-    console.log('✅ Factura creada:', response.data.id)
-    
-    const invoice = response.data
-    order.qvapayInvoiceId = invoice.id
-    order.qvapayInvoiceUrl = invoice.url
-    orders.set(orderId, order)
-    
-    res.json({
-      success: true,
-      invoiceUrl: invoice.url,
-      invoiceId: invoice.id
-    })
-    
+const response = await axios.post('https://api.qvapay.com/v2/invoice', payload, { headers })
+
+console.log('📦 Respuesta completa de QvaPay:', JSON.stringify(response.data, null, 2))
+
+// QvaPay puede devolver los datos en diferentes estructuras
+const invoice = response.data.data || response.data
+const invoiceId = invoice.id || invoice.invoice_id || invoice._id
+
+console.log('✅ Factura creada ID:', invoiceId)
+console.log('✅ URL de pago:', invoice.url || invoice.payment_url)
+
+order.qvapayInvoiceId = invoiceId
+order.qvapayInvoiceUrl = invoice.url || invoice.payment_url
+orders.set(orderId, order)
+
+res.json({
+  success: true,
+  invoiceUrl: invoice.url || invoice.payment_url,
+  invoiceId: invoiceId
+})    
   } catch (error) {
     console.error('❌ QvaPay error completo:')
     console.error('- Mensaje:', error.message)

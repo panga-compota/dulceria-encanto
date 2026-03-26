@@ -49,29 +49,41 @@ app.post('/api/create-order', async (req, res) => {
 // Crear factura en QvaPay
 app.post('/api/payment/qvapay/create-invoice', async (req, res) => {
   try {
+    console.log('📥 Recibida petición para crear factura:', req.body)
+    
     const { orderId, amount, customerEmail, customerName } = req.body
     
     const order = orders.get(orderId)
     if (!order) {
+      console.log('❌ Orden no encontrada:', orderId)
       return res.status(404).json({ success: false, error: 'Order not found' })
     }
     
+    console.log('🔑 Usando App ID:', process.env.QVAPAY_APP_ID ? '✅ Configurado' : '❌ FALTA')
+    console.log('🔐 Usando App Secret:', process.env.QVAPAY_APP_SECRET ? '✅ Configurado' : '❌ FALTA')
+    
     const headers = {
-      'app-id': QVAPAY_APP_ID,
-      'app-secret': QVAPAY_APP_SECRET,
+      'app-id': process.env.QVAPAY_APP_ID,
+      'app-secret': process.env.QVAPAY_APP_SECRET,
       'Content-Type': 'application/json'
     }
     
-    const response = await axios.post(`${QVAPAY_BASE_URL}/v2/invoice`, {
+    const payload = {
       amount: amount,
       currency: 'USD',
       description: `Pedido ${orderId} - DulceEncanto`,
       customer_email: customerEmail,
       customer_name: customerName,
-      redirect_url: `${FRONTEND_URL}/checkout/success?order=${orderId}`,
-      webhook_url: `${BACKEND_URL}/api/webhook/qvapay`,
+      redirect_url: `${process.env.FRONTEND_URL}/checkout/success?order=${orderId}`,
+      webhook_url: `${process.env.BACKEND_URL}/api/webhook/qvapay`,
       expiration_minutes: 60
-    }, { headers })
+    }
+    
+    console.log('📤 Enviando a QvaPay:', JSON.stringify(payload, null, 2))
+    
+    const response = await axios.post('https://api.qvapay.com/v2/invoice', payload, { headers })
+    
+    console.log('✅ Factura creada:', response.data.id)
     
     const invoice = response.data
     order.qvapayInvoiceId = invoice.id
@@ -85,14 +97,18 @@ app.post('/api/payment/qvapay/create-invoice', async (req, res) => {
     })
     
   } catch (error) {
-    console.error('QvaPay error:', error.response?.data || error.message)
+    console.error('❌ QvaPay error completo:')
+    console.error('- Mensaje:', error.message)
+    if (error.response) {
+      console.error('- Status:', error.response.status)
+      console.error('- Data:', JSON.stringify(error.response.data, null, 2))
+    }
     res.status(500).json({ 
       success: false, 
-      error: error.response?.data?.message || 'Error creating invoice'
+      error: error.response?.data?.message || error.message 
     })
   }
 })
-
 // Webhook de QvaPay
 app.post('/api/webhook/qvapay', async (req, res) => {
   try {

@@ -1,0 +1,41 @@
+@import 'tailwindcss';
+
+/* Tema personalizado para la dulcería */
+@theme {
+  --color-primary: #c17b7b;
+  --color-primary-dark: #a55e5e;
+  --color-secondary: #f5e6d3;
+  --color-accent: #e8b86b;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+}
+
+/* Capas base */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  
+  body {
+    @apply bg-white text-gray-800 font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-semibold tracking-tight;
+  }
+}
+
+/* Utilidades personalizadas */
+@utility container {
+  @apply mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}

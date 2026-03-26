@@ -435,7 +435,7 @@ const processCubaPayPayment = async () => {
   try {
     isRedirecting.value = true
     
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/cubapay/initiate`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/qvapay/create-invoice`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

@@ -1,13 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-
 const router = createRouter({
-  history: createWebHistory('/dulceencanto/'),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
       name: 'home',
       component: HomeView
+    },
+    {
+      path: '/productos',
+      name: 'products',
+      component: () => import('../views/ProductsView.vue')
     },
     {
       path: '/nosotros',
@@ -20,9 +24,19 @@ const router = createRouter({
       component: () => import('../views/ContactView.vue')
     },
     {
-      path: '/productos',
-      name: 'products',
-      component: () => import('../views/ProductsView.vue')
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('../views/CheckoutView.vue')
+    },
+    {
+      path: '/checkout/success',
+      name: 'checkout-success',
+      component: () => import('../views/CheckoutSuccessView.vue')
+    },
+    {
+      path: '/checkout/cancel',
+      name: 'checkout-cancel',
+      component: () => import('../views/CheckoutCancelView.vue')
     }
   ]
 })
